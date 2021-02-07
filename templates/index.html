@@ -25,8 +25,34 @@
       {% endfor %}
     </div>
     <div class="col-sm-5 col-sm-offset-1">
-        {% if results %}
-          <h2>Tweets</h2>
+      <h2>Results</h2>
+      {% if results %}
+      <br>
+      <div id="results">
+        <table class="table table-striped" style="max-width: 50vw;">
+          <thead>
+            <tr>
+                  <th>URL</th>
+                  <th>Text</th>
+                  <th>Sentiment</th>
+                  <th>Compound</th>
+                </tr>
+              </thead>
+              {% for result in results%}
+                <tr>
+                  <td>{{ result[0] }}</td>
+                  <td>{{ result[1] }}</td>
+                  <td>{{ result[2] }}</td>
+                  <td>{{ result[3] }}</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-sm-5">
+        <h2>Previous Results</h2>
+        {% if previous_results %}
           <br>
           <div id="results">
             <table class="table table-striped" style="max-width: 50vw;">
@@ -38,7 +64,7 @@
                   <th>Compound</th>
                 </tr>
               </thead>
-              {% for result in results%}
+              {% for result in previous_results%}
                 <tr>
                   <td>{{ result[0] }}</td>
                   <td>{{ result[1] }}</td>
