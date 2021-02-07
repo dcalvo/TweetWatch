@@ -2,15 +2,15 @@ from app import db
 from sqlalchemy.dialects.postgresql import JSON
 
 
-class Result(db.Model):
-    __tablename__ = 'results'
+class Tweet(db.Model):
+    __tablename__ = 'tweets'
 
     id = db.Column(db.Integer, primary_key=True)
-    tweet = db.Column(db.String())
+    text = db.Column(db.String())
     sentiment = db.Column(JSON)
     
-    def __init__(self, tweet, sentiment):
-        self.tweet = tweet
+    def __init__(self, text, sentiment):
+        self.text = text
         self.sentiment = sentiment
 
     def __repr__(self):
