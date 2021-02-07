@@ -29,17 +29,21 @@
           <h2>Tweets</h2>
           <br>
           <div id="results">
-            <table class="table table-striped" style="max-width: 300px;">
+            <table class="table table-striped" style="max-width: 50vw;">
               <thead>
                 <tr>
-                  <th>Tweet</th>
+                  <th>URL</th>
+                  <th>Text</th>
                   <th>Sentiment</th>
+                  <th>Compound</th>
                 </tr>
               </thead>
               {% for result in results%}
                 <tr>
                   <td>{{ result[0] }}</td>
                   <td>{{ result[1] }}</td>
+                  <td>{{ result[2] }}</td>
+                  <td>{{ result[3] }}</td>
                 </tr>
               {% endfor %}
             </table>

@@ -33,6 +33,7 @@ def index():
         if score:
             try:
                 result = Tweet(
+                    url=None,
                     text=url,
                     sentiment=score
                 )
@@ -42,7 +43,7 @@ def index():
                 errors.append("Unable to add item to database.")
     tweets = Tweet.query.order_by(Tweet.id.desc()).limit(15).all()
     for tweet in tweets:
-        results.append((tweet.text, tweet.sentiment))
+        results.append((tweet.url, tweet.text, tweet.sentiment, tweet.compound))
     return render_template('index.html', errors=errors, results=results)
 
 
