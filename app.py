@@ -30,7 +30,6 @@ def index():
                 "Unable to get URL. Please make sure it's valid and try again."
             )
         if score:
-            results.append((url, score))
             try:
                 result = Result(
                     tweet=url,
@@ -40,6 +39,9 @@ def index():
                 db.session.commit()
             except:
                 errors.append("Unable to add item to database.")
+    tweets = Result.query.order_by(Result.id.desc()).limit(15).all()
+    for tweet in tweets:
+        results.append((tweet.tweet, tweet.sentiment))
     return render_template('index.html', errors=errors, results=results)
 
 
