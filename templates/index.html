@@ -15,7 +15,7 @@
       <h1>dangertweet</h1>
       <form role="form" method='POST' action='/'>
         <div class="form-group">
-          <input type="text" name="url" class="form-control" id="url-box" placeholder="Enter URL..." style="max-width: 300px;" autofocus required>
+          <input type="text" name="search" class="form-control" id="search-box" placeholder="Search Twitter" style="max-width: 300px;" autofocus required>
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
@@ -40,7 +40,7 @@
               </thead>
               {% for result in results%}
                 <tr>
-                  <td>{{ result[0] }}</td>
+                  <td><a target="_blank" rel="noopener noreferrer" href="{{ result[0] }}">link</a></td>
                   <td>{{ result[1] }}</td>
                   <td>{{ result[2] }}</td>
                   <td>{{ result[3] }}</td>
@@ -66,7 +66,7 @@
               </thead>
               {% for result in previous_results%}
                 <tr>
-                  <td>{{ result[0] }}</td>
+                  <td><a target="_blank" rel="noopener noreferrer" href="{{ result[0] }}">link</a></td>
                   <td>{{ result[1] }}</td>
                   <td>{{ result[2] }}</td>
                   <td>{{ result[3] }}</td>

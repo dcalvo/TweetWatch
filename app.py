@@ -1,12 +1,14 @@
 import os
 import requests
-#import tweepy
+import tweepy
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-TWEETS_TO_SEARCH = 5
+TWEETS_TO_SEARCH = 100
 PREVIOUS_RESULT_NUM_TO_DISPLAY = 15
+# Returns tweets that are BELOW the threshold
+SENTIMENT_THRESHOLD = -0.8
 
 
 app = Flask(__name__)
@@ -15,24 +17,26 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 analyzer = SentimentIntensityAnalyzer()
 
-# auth = tweepy.AppAuthHandler(consumer_key, consumer_secret)
-# api = tweepy.API(auth)
+auth = tweepy.AppAuthHandler(os.environ['CONSUMER_KEY'], os.environ['CONSUMER_SECRET'])
+api = tweepy.API(auth, wait_on_rate_limit=True)
 
 from models import Tweet
 
-def get_negative_tweets(url, num):
-    # for tweet in tweepy.Cursor(api.search, q='tweepy').items(10):
-    #     print(tweet.text)
-    score = analyzer.polarity_scores(url)
+def get_negative_tweets(search):
     results = []
-    for i in range(num):
+    tweets = []
+    for tweet in tweepy.Cursor(api.search, lang="en", result_type="recent", q=search).items(TWEETS_TO_SEARCH):
+        score = analyzer.polarity_scores(tweet.text)
+        if score["compound"] < SENTIMENT_THRESHOLD:
+            results.append((tweet.id_str, tweet.text, score))
+    for tweet in results:
         result = Tweet(
-            url=None,
-            text=url,
-            sentiment=score
+            url="https://twitter.com/twitter/statuses/" + tweet[0],
+            text=tweet[1],
+            sentiment=tweet[2]
         )
-        results.append(result)
-    return results
+        tweets.append(result)
+    return tweets
 
 def get_previous_results(num):
     previous_results = []
@@ -43,15 +47,16 @@ def get_previous_results(num):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    tweets = []
     errors = []
     results = []
     previous_results = get_previous_results(PREVIOUS_RESULT_NUM_TO_DISPLAY)
     if request.method == "POST":
         try:
-            url = request.form['url']
-            tweets = get_negative_tweets(url, TWEETS_TO_SEARCH)
-            print(results)
-        except:
+            search = request.form['search']
+            tweets = get_negative_tweets(search)
+        except Exception as e:
+            print(e)
             errors.append(
                 "Unable to get URL. Please make sure it's valid and try again."
             )
