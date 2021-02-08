@@ -25,10 +25,12 @@ from models import Tweet
 def get_negative_tweets(search):
     results = []
     tweets = []
+    # Search tweets based on given parameter for strongly opinionated ones
     for tweet in tweepy.Cursor(api.search, lang="en", result_type="recent", q=search).items(TWEETS_TO_SEARCH):
         score = analyzer.polarity_scores(tweet.text)
         if score["compound"] < SENTIMENT_THRESHOLD:
             results.append((tweet.id_str, tweet.text, score))
+    # Transform results into Tweet objects
     for tweet in results:
         result = Tweet(
             url="https://twitter.com/twitter/statuses/" + tweet[0],
@@ -38,9 +40,9 @@ def get_negative_tweets(search):
         tweets.append(result)
     return tweets
 
-def get_previous_results(num):
+def get_previous_results():
     previous_results = []
-    tweets = Tweet.query.order_by(Tweet.id.desc()).limit(num).all()
+    tweets = Tweet.query.order_by(Tweet.id.desc()).limit(PREVIOUS_RESULT_NUM_TO_DISPLAY).all()
     for tweet in tweets:
         previous_results.append((tweet.url, tweet.text, tweet.sentiment, tweet.compound))
     return previous_results
@@ -50,15 +52,14 @@ def index():
     tweets = []
     errors = []
     results = []
-    previous_results = get_previous_results(PREVIOUS_RESULT_NUM_TO_DISPLAY)
+    previous_results = get_previous_results()
     if request.method == "POST":
         try:
             search = request.form['search']
             tweets = get_negative_tweets(search)
-        except Exception as e:
-            print(e)
+        except:
             errors.append(
-                "Unable to get URL. Please make sure it's valid and try again."
+                "Unable to get search. Please make sure it's valid and try again."
             )
         if tweets:
             try:
