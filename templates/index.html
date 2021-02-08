@@ -6,18 +6,25 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
       .container {
-        max-width: 1000px;
+        max-width: 900px;
       }
     </style>
     <script>
       function updateTextInput(val) {
-          document.getElementById('textInput').value=val; 
+          document.getElementById('threshold_value').value=val; 
       }
     </script>
   </head>
   <body>
     <div class="container">
       <h1>dangertweet</h1>
+      <div style="float: right; width: 500px">
+        <p>Welcome to dangertweet<a href="https://zombo.com/">.</a> A sentiment analysis engine hooked up to Twitter.</p>
+        <p>A tweet is graded by the 'Sentiment' of the text. Sentiment can be regarded as 'Negative', 'Neutral' and 'Positive'.
+          These scores are used to calculate the final 'Compound' value used by dangertweet.</p>
+          <p>The Sentiment Threshold is compared against a tweet's Compound value, only returning tweets that are below the threshold.
+            The higher the Sentiment Threshold, the more results are returned.</p>
+      </div>
       <form role="form" method='POST' action='/'>
         <div class="form-group">
           <input type="text" name="search" class="form-control" id="search-box" placeholder="Search Twitter" style="max-width: 300px;" autofocus required>
@@ -25,7 +32,7 @@
             <input type="range" id="threshold" name="threshold" 
                    min="-1.0" max="1.0" value="-0.8" step="0.05" style="width: 200px" onchange="updateTextInput(this.value);">
             <label for="threshold">Sentiment Threshold</label>
-            <input type="text" id="textInput" value="-0.8" readonly style="width: 50px">
+            <input type="text" id="threshold_value" value="-0.8" readonly style="width: 40px">
           </div>
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
