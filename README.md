@@ -30,3 +30,10 @@ export CONSUMER_SECRET="<consumer_secret>"
 - Many of the steps above could go wrong. Troubleshoot as you go.
 - Run `deactivate` to leave the venv.
 - Run `psql dangertweet_dev` to get into the Postgres CLI for the DB.
+- Run `python manage.py runserver` to run the localhost server at [127.0.0.1:5000](http://127.0.0.1:5000)
+- Run `python manage.py db migrate` after changing models.py to save the changes.
+- Run `python manage.py db upgrade` to commit the changes to the DB.
+- Run `python manage.py db downgrade` if your changes break the DB.
+
+### TODO
+- Add heroku config section
