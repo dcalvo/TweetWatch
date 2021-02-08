@@ -22,13 +22,13 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 from models import Tweet
 
-def get_negative_tweets(search):
+def get_negative_tweets(search, threshold=SENTIMENT_THRESHOLD):
     results = []
     tweets = []
     # Search tweets based on given parameter for strongly opinionated ones
     for tweet in tweepy.Cursor(api.search, lang="en", result_type="recent", q=search).items(TWEETS_TO_SEARCH):
         score = analyzer.polarity_scores(tweet.text)
-        if score["compound"] < SENTIMENT_THRESHOLD:
+        if score["compound"] < threshold:
             results.append((tweet.id_str, tweet.text, score))
     # Transform results into Tweet objects
     for tweet in results:
@@ -57,8 +57,10 @@ def index():
     if request.method == "POST":
         try:
             search = request.form['search']
-            tweets = get_negative_tweets(search)
-        except:
+            threshold = float(request.form["threshold"])
+            tweets = get_negative_tweets(search, threshold)
+        except Exception as e:
+            print(e)
             errors.append(
                 "Unable to get search. Please make sure it's valid and try again."
             )
