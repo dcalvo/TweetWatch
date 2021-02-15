@@ -10,11 +10,14 @@ Finds Tweets that are more likely to be false information.
 2. `python3 -m venv env`
 3. Create a `.env` file in the root directory. Add the following:
 ```
-source env/bin/activate
+source env/Scripts/activate
 export APP_SETTINGS="config.DevelopmentConfig"
 export DATABASE_URL="postgresql:///dangertweet_dev"
 export CONSUMER_KEY="<consumer_key>"
 export CONSUMER_SECRET="<consumer_secret>"
+
+# Note! sometimes the database_url will need an additional username and password, which
+# will look like "postgresql://user:pass@localhost:port/dangertweet_dev"
 ```
 4. `python -m pip install autoenv`
 5. ```echo "source `which activate.sh`" >> ~/.bashrc && source ~/.bashrc```
@@ -34,6 +37,9 @@ export CONSUMER_SECRET="<consumer_secret>"
 - Run `python manage.py db migrate` after changing models.py to save the changes.
 - Run `python manage.py db upgrade` to commit the changes to the DB.
 - Run `python manage.py db downgrade` if your changes break the DB.
+- If your file path contains spaces, manually open `~/.bashrc` and add the necessary back slashes
+- Additionally, change the version number of autoenv to `pip install autoenv==0.2.0`, which despite
+  looking like an older version, is actually a newer version.
 
 ### TODO
 - Add heroku config section
