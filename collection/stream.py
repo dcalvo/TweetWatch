@@ -25,7 +25,9 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-for line in r.iter_lines():
+num_added = 0
+
+for i, line in enumerate(r.iter_lines()):
     if line:
         decoded_line = line.decode('utf-8')
         tweet = json.loads(decoded_line)
@@ -64,6 +66,9 @@ for line in r.iter_lines():
             )
             session.add(new_tweet)
             session.commit()
+            num_added += 1
 
     else:
         print('heartbeat')
+    if i % 10 == 0:
+        print(i, 'tweets,', num_added, 'inserted')
