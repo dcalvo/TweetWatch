@@ -29,8 +29,9 @@ session = DBSession()
 
 num_added = 0
 
-def add_tweet(tw, user, sc):
+def add_tweet(tw, user):
     global num_added
+    sc = analyzer.polarity_scores(tweet['text'])
     if 'location' in user.keys():
         loc = user['location']
     else:
@@ -60,6 +61,7 @@ def add_tweet(tw, user, sc):
 
 for i, line in enumerate(r.iter_lines()):
     if line:
+        is_retweet = False
         decoded_line = line.decode('utf-8')
         tweet = json.loads(decoded_line)
 
@@ -78,18 +80,19 @@ for i, line in enumerate(r.iter_lines()):
             if 'referenced_tweets' in tweet['data'].keys() and len(tweet['data']['referenced_tweets']) > 0:
                 for ref_tw in tweet['data']['referenced_tweets']:
                     if ref_tw['type'] == 'retweeted':
-                        ref_tw_details = next((tw for tw in tweet['includes']['tweets'] if tw['id'] == ref_tw['id'])
-                                              , None)
-                        if ref_tw_details is not None:
-                            ref_tw_user_details = next(
-                                (ur for ur in tweet['includes']['users'] if ur['id'] == ref_tw_details['author_id'])
-                                , None)
-                            score = analyzer.polarity_scores(tweet['data']['text'])
-                            add_tweet(ref_tw_details, ref_tw_user_details, score)
+                        is_retweet = True
+                    ref_tw_details = next((tw for tw in tweet['includes']['tweets'] if tw['id'] == ref_tw['id']),
+                                          None)
+                    if ref_tw_details is not None:
+                        ref_tw_user_details = next(
+                            (ur for ur in tweet['includes']['users'] if ur['id'] == ref_tw_details['author_id']),
+                            None)
+                        score = analyzer.polarity_scores(tweet['data']['text'])
+                        add_tweet(ref_tw_details, ref_tw_user_details)
 
-            else:
+            if not is_retweet:
                 score = analyzer.polarity_scores(tweet['data']['text'])
-                add_tweet(tweet['data'], tweet['includes']['users'][0], score)
+                add_tweet(tweet['data'], tweet['includes']['users'][0])
 
     else:
         print('heartbeat')
