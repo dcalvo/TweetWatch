@@ -29,5 +29,5 @@ class Tweet(Base):
     time_created  = Column(DateTime(timezone=True), server_default=func.now())
     time_updated  = Column(DateTime(timezone=True), onupdate=func.now())
 
-engine = create_engine('sqlite:///tweets.db')
+engine = create_engine('sqlite:///tweets2.db')
 Base.metadata.create_all(engine)
