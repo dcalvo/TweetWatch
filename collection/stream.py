@@ -31,7 +31,7 @@ num_added = 0
 
 def add_tweet(tw, user):
     global num_added
-    sc = analyzer.polarity_scores(tweet['text'])
+    sc = analyzer.polarity_scores(tw['text'])
     if 'location' in user.keys():
         loc = user['location']
     else:
@@ -73,10 +73,10 @@ for i, line in enumerate(r.iter_lines()):
         lang = tweet['data']['lang']
 
         if rt_count > rt_threshold and lang == 'en':
-            print(tweet['data']['public_metrics'])
-            print(tweet['data']['referenced_tweets'])
-            print(tweet['includes']['tweets'])
-            print(tweet['includes']['users'])
+            # print(tweet['data']['public_metrics'])
+            # print(tweet['data']['referenced_tweets'])
+            # print(tweet['includes']['tweets'])
+            # print(tweet['includes']['users'])
             if 'referenced_tweets' in tweet['data'].keys() and len(tweet['data']['referenced_tweets']) > 0:
                 for ref_tw in tweet['data']['referenced_tweets']:
                     if ref_tw['type'] == 'retweeted':
@@ -87,7 +87,6 @@ for i, line in enumerate(r.iter_lines()):
                         ref_tw_user_details = next(
                             (ur for ur in tweet['includes']['users'] if ur['id'] == ref_tw_details['author_id']),
                             None)
-                        score = analyzer.polarity_scores(tweet['data']['text'])
                         add_tweet(ref_tw_details, ref_tw_user_details)
 
             if not is_retweet:
