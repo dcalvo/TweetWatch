@@ -10,13 +10,14 @@ class Tweet(Base):
     __tablename__ = 'tweets'
 
     id            = Column(Integer, primary_key=True)
+    reacted_id    = Column(Integer, primary_key=True)
     text          = Column(String(300))
     sentiment_p   = Column(Float)
     sentiment_l   = Column(Float)
     sentiment_n   = Column(Float)
     compound      = Column(Float)
     sent_bucket   = Column(Integer)
-    retweet_count = Column(Integer)
+    retweet_count = Column(Integer, primary_key=True)
     reply_count   = Column(Integer)
     like_count    = Column(Integer)
     quote_count   = Column(Integer)
@@ -26,6 +27,8 @@ class Tweet(Base):
     u_following_c = Column(Integer)
     u_tweet_c     = Column(Integer)
     u_listed_c    = Column(Integer)
+    time_tweeted  = Column(DateTime(timezone=True))
+    time_reacted  = Column(DateTime(timezone=True))
     time_created  = Column(DateTime(timezone=True), server_default=func.now())
     time_updated  = Column(DateTime(timezone=True), onupdate=func.now())
 

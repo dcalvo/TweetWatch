@@ -2,6 +2,7 @@ import json
 import requests
 import os
 
+from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -29,7 +30,8 @@ session = DBSession()
 
 num_added = 0
 
-def add_tweet(tw, user):
+
+def add_tweet(tw, user, reacted_id = 0, time_reacted = None):
     global num_added
     sc = analyzer.polarity_scores(tw['text'])
     if 'location' in user.keys():
@@ -38,6 +40,7 @@ def add_tweet(tw, user):
         loc = "NOT PROVIDED"
     new_tweet = Tweet(
         id            = int(tw['id']),
+        reacted_id    = int(reacted_id),
         text          = tw['text'],
         sentiment_p   = sc['pos'],
         sentiment_l   = sc['neu'],
@@ -53,7 +56,10 @@ def add_tweet(tw, user):
         u_followers_c = user['public_metrics']['followers_count'],
         u_following_c = user['public_metrics']['following_count'],
         u_tweet_c     = user['public_metrics']['tweet_count'],
-        u_listed_c    = user['public_metrics']['listed_count']
+        u_listed_c    = user['public_metrics']['listed_count'],
+        time_tweeted  = datetime.fromisoformat(tw['created_at'].replace('Z', '+00:00')),
+        time_reacted  = datetime.fromtimestamp(1) if time_reacted is None
+                   else datetime.fromisoformat(time_reacted.replace('Z', '+00:00'))
     )
     session.add(new_tweet)
     session.commit()
@@ -87,7 +93,7 @@ for i, line in enumerate(r.iter_lines()):
                         ref_tw_user_details = next(
                             (ur for ur in tweet['includes']['users'] if ur['id'] == ref_tw_details['author_id']),
                             None)
-                        add_tweet(ref_tw_details, ref_tw_user_details)
+                        add_tweet(ref_tw_details, ref_tw_user_details, tweet['data']['id'], tweet['data']['created_at'])
 
             if not is_retweet:
                 score = analyzer.polarity_scores(tweet['data']['text'])
