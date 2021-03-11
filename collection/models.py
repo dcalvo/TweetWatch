@@ -1,10 +1,22 @@
+from os import environ
+
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy import Column, Integer, String, DateTime, Float
+from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 
 Base = declarative_base()
+
+
+class QueryPolicy(Base):
+    __tablename__ = 'policies'
+
+    id           = Column(Integer, primary_key=True)
+    policy_name  = Column(String(32), unique=True)
+    languages    = Column(String(32))
+    rt_threshold = Column(Integer)
+
 
 class Tweet(Base):
     __tablename__ = 'tweets'
@@ -31,6 +43,10 @@ class Tweet(Base):
     time_reacted  = Column(DateTime(timezone=True))
     time_created  = Column(DateTime(timezone=True), server_default=func.now())
     time_updated  = Column(DateTime(timezone=True), onupdate=func.now())
+    policy        = Column(String(32), ForeignKey('policies.policy_name'))
 
-engine = create_engine('sqlite:///tweets2.db')
+
+DatabaseUrl = environ['SQLITE_URL']
+
+engine = create_engine(DatabaseUrl)
 Base.metadata.create_all(engine)
