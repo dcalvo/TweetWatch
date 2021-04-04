@@ -5,11 +5,12 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
+
+
 TWEETS_TO_SEARCH = 100
 PREVIOUS_RESULT_NUM_TO_DISPLAY = 15
 # Returns tweets that are BELOW the threshold
 SENTIMENT_THRESHOLD = -0.8
-
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -20,7 +21,9 @@ analyzer = SentimentIntensityAnalyzer()
 auth = tweepy.AppAuthHandler(os.environ['CONSUMER_KEY'], os.environ['CONSUMER_SECRET'])
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-from models import Tweet
+
+from models import TweetO
+
 
 def get_negative_tweets(search, threshold=SENTIMENT_THRESHOLD):
     results = []
@@ -32,7 +35,7 @@ def get_negative_tweets(search, threshold=SENTIMENT_THRESHOLD):
             results.append((tweet.id_str, tweet.text, score))
     # Transform results into Tweet objects
     for tweet in results:
-        result = Tweet(
+        result = TweetO(
             url="https://twitter.com/twitter/statuses/" + tweet[0],
             text=tweet[1],
             sentiment=tweet[2]
@@ -40,12 +43,14 @@ def get_negative_tweets(search, threshold=SENTIMENT_THRESHOLD):
         tweets.append(result)
     return tweets
 
+
 def get_previous_results():
     previous_results = []
-    tweets = Tweet.query.order_by(Tweet.id.desc()).limit(PREVIOUS_RESULT_NUM_TO_DISPLAY).all()
+    tweets = TweetO.query.order_by(TweetO.id.desc()).limit(PREVIOUS_RESULT_NUM_TO_DISPLAY).all()
     for tweet in tweets:
         previous_results.append((tweet.url, tweet.text, tweet.sentiment, tweet.compound))
     return previous_results
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -73,8 +78,8 @@ def index():
             except:
                 errors.append("Unable to add item to database.")
 
-    return render_template('index.html', errors=errors, results=results, previous_results=previous_results, keyword=search)
-
+    return render_template('index.html', errors=errors, results=results, previous_results=previous_results,
+                           keyword=search)
 
 
 if __name__ == '__main__':
