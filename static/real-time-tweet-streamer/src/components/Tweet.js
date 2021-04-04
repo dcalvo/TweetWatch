@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useRef} from "react";
 import { TwitterTweetEmbed } from "react-twitter-embed";
+import '../stylesheets/Tweet.css';
 
 const Tweet = ({ json }) => {
   const { id, text, public_metrics, sentiment } = json.data;
+  const dragCntr = useRef(false);
 
   const options = {
     cards: "hidden",
@@ -17,23 +19,31 @@ const Tweet = ({ json }) => {
         : object[key]}</li>
   );
 
+  const navigateToTwitter = () => {
+      if(!dragCntr.current) {
+          window.open(`https://twitter.com/foobar/status/${id}`);
+      }
+  }
+
+  const setDragTrue = () => {
+      dragCntr.current = true
+  }
+
+  const setDragFalse = () => {
+      dragCntr.current = false
+  }
+
   return (
-      <React.Fragment>
+      <blockquote className={"twitter-tweet"} onMouseDown={setDragFalse} onMouseMove={setDragTrue} onMouseUp={navigateToTwitter}>
+        <p>{`Tweet ID: ${id}`}</p>
+        <p>{text}</p>
         <ul>
-          <li>{id}</li>
-          <li>{text}</li>
-          <li>
-            <ul>
-              {printObjects(public_metrics)}
-            </ul>
-          </li>
-          <li>
-            <ul>
-              {printObjects(sentiment)}
-            </ul>
-          </li>
+          {printObjects(public_metrics)}
         </ul>
-      </React.Fragment>
+        <ul>
+          {printObjects(sentiment)}
+        </ul>
+      </blockquote>
   );
 };
 
