@@ -29,6 +29,10 @@ const rulesURL = new URL(
   "https://api.twitter.com/2/tweets/search/stream/rules"
 );
 
+const lookUp = new URL(
+  "https://api.twitter.com/2/tweets/"
+);
+
 const errorMessage = {
   title: "Please Wait",
   detail: "Waiting for new Tweets to be posted...",
@@ -116,8 +120,17 @@ const streamTweets = (socket, token) => {
     timeout: 31000,
   };
 
+  const configLookup = {
+    url: streamURL,
+    auth: {
+      bearer: token,
+    },
+    timeout: 31000,
+  };
+
   try {
     const stream = request.get(config);
+    const lookup = request.get(configLookup);
 
     stream
       .on("data", (data) => {
@@ -129,6 +142,7 @@ const streamTweets = (socket, token) => {
             reconnect(stream, socket, token);
           } else {
             if (json.data) {
+              console.log(lookup)
               console.log('tweet!');
               socket.emit("tweet", json);
             } else {
