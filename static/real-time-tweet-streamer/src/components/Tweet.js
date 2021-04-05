@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useRef} from "react";
 import { TwitterTweetEmbed } from "react-twitter-embed";
+import '../stylesheets/Tweet.css';
 
 const Tweet = ({ json }) => {
   const { id, text, public_metrics, sentiment } = json.data;
+  const dragCntr = useRef(false);
 
   const {tokens, words, positive, negative, calculation, ...sent_to_print} = sentiment;
 
