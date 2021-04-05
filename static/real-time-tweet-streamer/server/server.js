@@ -22,15 +22,11 @@ const BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
 let timeout = 0;
 
 const streamURL = new URL(
-  "https://api.twitter.com/2/tweets/search/stream?tweet.fields=context_annotations,public_metrics&expansions=author_id"
+  "https://api.twitter.com/2/tweets/search/stream?tweet.fields=context_annotations,public_metrics&expansions=author_id,referenced_tweets.id"
 );
 
 const rulesURL = new URL(
   "https://api.twitter.com/2/tweets/search/stream/rules"
-);
-
-const lookUp = new URL(
-  "https://api.twitter.com/2/tweets/"
 );
 
 const errorMessage = {
@@ -120,18 +116,9 @@ const streamTweets = (socket, token) => {
     timeout: 31000,
   };
 
-  const configLookup = {
-    url: streamURL,
-    auth: {
-      bearer: token,
-    },
-    timeout: 31000,
-  };
-
   try {
     const stream = request.get(config);
-    const lookup = request.get(configLookup);
-
+  
     stream
       .on("data", (data) => {
         try {
@@ -142,9 +129,11 @@ const streamTweets = (socket, token) => {
             reconnect(stream, socket, token);
           } else {
             if (json.data) {
-              console.log(lookup)
-              console.log('tweet!');
-              socket.emit("tweet", json);
+              console.log('tweet!--------------------------------------------------');
+              if (json.data.referenced_tweets[0].type === 'retweeted') {
+                json.data.text = json.includes.tweets[0].text
+              }
+              socket.emit("tweet", json); 
             } else {
               socket.emit("authError", json);
             }
