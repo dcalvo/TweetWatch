@@ -1,3 +1,5 @@
+import json
+
 from app import db
 # from sqlalchemy.dialects.postgresql import JSON
 
@@ -57,14 +59,14 @@ class TweetO(db.Model):
     id        = db.Column(db.Integer, primary_key=True)
     url       = db.Column(db.String())
     text      = db.Column(db.String())
-    sentiment = db.Column(db.Text)
+    sentiment = db.Column(db.String())
     compound  = db.Column(db.Float)
     retweets  = db.Column(db.Integer)
 
     def __init__(self, url, text, sentiment, retweets):
         self.text = text
         self.url = url
-        self.sentiment = sentiment
+        self.sentiment = json.dumps(sentiment)
         self.compound = sentiment["compound"]
         self.retweets = retweets
 
