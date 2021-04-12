@@ -1,5 +1,5 @@
 from app import db
-from sqlalchemy.dialects.postgresql import JSON
+# from sqlalchemy.dialects.postgresql import JSON
 
 
 class Tweet(db.Model):
@@ -52,19 +52,24 @@ class Tweet(db.Model):
 
 
 class TweetO(db.Model):
-    __tablename__ = 'tweets'
+    __tablename__ = 'tweets_o'
 
     id        = db.Column(db.Integer, primary_key=True)
     url       = db.Column(db.String())
     text      = db.Column(db.String())
-    sentiment = db.Column(JSON)
+    sentiment = db.Column(db.Text)
     compound  = db.Column(db.Float)
+    retweets  = db.Column(db.Integer)
 
-    def __init__(self, url, text, sentiment):
+    def __init__(self, url, text, sentiment, retweets):
         self.text = text
         self.url = url
         self.sentiment = sentiment
         self.compound = sentiment["compound"]
+        self.retweets = retweets
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+
+db.Model.metadata.create_all(db.engine)
