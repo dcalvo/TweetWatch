@@ -14,7 +14,7 @@ PREVIOUS_RESULT_TO_TEMP_STORE = 50
 SENTIMENT_THRESHOLD = -0.8
 DURATION = 0
 
-app = Flask(__name__)
+app = Flask(__name__) #, static_url_path='/templates/build')
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -38,7 +38,11 @@ def get_negative_tweets(search, threshold=SENTIMENT_THRESHOLD, duration=DURATION
                                tweet_mode='extended',
                                until=(date.today() - timedelta(days=duration-1)).isoformat()
                                ).items(TWEETS_TO_SEARCH):
-        full_text = tweet.retweeted_status.full_text if tweet.retweeted else tweet.full_text
+        full_text = tweet.full_text[:tweet.full_text.find(':')+2] + tweet.retweeted_status.full_text if hasattr(tweet, 'retweeted_status') else tweet.full_text
+        print(tweet.retweeted)
+        print(tweet.full_text)
+        # print(tweet.retweeted_status)
+        # print(tweet.retweeted_status.extended_tweet)
         score = analyzer.polarity_scores(full_text)
         if score["compound"] < threshold:
             results.append((tweet.id_str, full_text, score, tweet.retweet_count, tweet.retweeted))
@@ -103,8 +107,8 @@ def index():
             try:
                 for tweet, retweeted in tweets:
                     db.session.add(tweet)
-                    results.append((tweet.url, tweet.text, tweet.sentiment, tweet.retweets))
-                    print(json.dumps(tweet.sentiment), type(json.dumps(tweet.sentiment)))
+                    results.append((tweet.url, tweet.text, tweet.compound, tweet.retweets))
+                    print(tweet.sentiment, type(tweet.sentiment))
                 db.session.commit()
             except Exception as e:
                 print(e)

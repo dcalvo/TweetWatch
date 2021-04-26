@@ -1,4 +1,4 @@
-# dangertweet
+# TweetWatch
 
 ## What is it?
 
